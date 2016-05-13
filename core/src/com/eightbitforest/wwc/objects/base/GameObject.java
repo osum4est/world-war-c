@@ -15,13 +15,29 @@ public abstract class GameObject implements IUpdates {
 
     public GameObject(Sprite sprite) {
         this.sprite = sprite;
-//        this.sprite.setScale(Globals.PPM);
     }
+    public GameObject(String image) {
+        sprite = getSprite(image);
+    }
+
+    public Sprite getSprite(String image) {
+        return new Sprite(new Texture(image));
+    }
+
     @Override
     public void render(SpriteBatch batch) {
         batch.begin();
-//        batch.draw(sprite, sprite.getX() - sprite.getWidth() / 2 / Globals.PPM, sprite.getY() - sprite.getHeight() / 2 / Globals.PPM, sprite.getWidth() / Globals.PPM, sprite.getHeight() / Globals.PPM);
-        batch.draw(sprite, sprite.getX(), sprite.getY(), sprite.getWidth() / Globals.PPM, sprite.getHeight() / Globals.PPM);
+//        if (renderInMiddle)
+//            batch.draw(sprite,
+//                    sprite.getX() - sprite.getWidth() / 2 / Globals.PPM, sprite.getY() - sprite.getHeight() / 2 / Globals.PPM,
+//                    sprite.getWidth() / 2 / Globals.PPM, sprite.getHeight() / 4 / Globals.PPM,
+//                    sprite.getWidth() / Globals.PPM, sprite.getHeight() / Globals.PPM,
+//                    1, 1,
+//                    sprite.getRotation());
+//        else
+//            batch.draw(sprite, sprite.getX(), sprite.getY(), sprite.getWidth() / Globals.PPM, sprite.getHeight() / Globals.PPM, , 1, 1, sprite.getRotation());
+
+        sprite.draw(batch);
         batch.end();
     }
 
@@ -32,6 +48,6 @@ public abstract class GameObject implements IUpdates {
 
     @Override
     public void dispose() {
-
+        sprite.getTexture().dispose();
     }
 }

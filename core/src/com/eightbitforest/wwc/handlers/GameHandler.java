@@ -3,6 +3,9 @@ package com.eightbitforest.wwc.handlers;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.ui.List;
+import com.badlogic.gdx.utils.Array;
+import com.eightbitforest.wwc.objects.Tank;
 import com.eightbitforest.wwc.objects.base.GameObject;
 
 /**
@@ -15,6 +18,7 @@ public class GameHandler {
 
     public SpriteBatch batch;
     public WorldHandler worldHandler;
+    public RoundHandler roundHandler;
 
     public CameraHandler cameraHandler;
 
@@ -24,6 +28,8 @@ public class GameHandler {
         batch = new SpriteBatch();
         worldHandler = new WorldHandler();
         cameraHandler = new CameraHandler();
+        roundHandler = new RoundHandler(worldHandler.getTanks());
+        roundHandler.startRound();
     }
 
     public void render() {
@@ -38,8 +44,7 @@ public class GameHandler {
     public void update(float deltatime) {
         cameraHandler.cameraUpdate();
         worldHandler.update(deltatime);
-
-
+        roundHandler.update();
     }
 
     public void dispose() {
