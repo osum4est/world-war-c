@@ -18,12 +18,6 @@ public class WWCMain extends ApplicationAdapter {
     public GameHandler gameHandler;
 	@Override
 	public void create () {
-        stage = new Stage(new ScreenViewport());
-        VisUI.load();
-        FileChooser chooser = new FileChooser(FileChooser.Mode.OPEN);
-        chooser.setPosition(50, 50);
-
-		stage.addActor(chooser);
 
         gameHandler = new GameHandler();
 	}

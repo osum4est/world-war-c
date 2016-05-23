@@ -2,6 +2,8 @@ package com.eightbitforest.wwc.objects;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
@@ -12,22 +14,31 @@ import com.eightbitforest.wwc.objects.missiles.PlainMissile;
 
 public abstract class Tank extends GameObjectDynamic {
 
-    public final float maxHealth = 100f;
-    public float currentHealht = maxHealth;
-    public boolean isAlive() { return currentHealht > 0; }
+    public Sprite barrelSprite;
+    public Sprite healthSprite;
+    public Sprite fuelSprite;
 
-    public final float maxVelocity = 15f;
+    public final float maxHealth = 100f;
+    public float currentHealth = maxHealth;
+    public boolean isAlive() { return currentHealth > 0; }
+
+    public final float maxVelocity = 7.5f;
     public float currentVelocity;
     public final float maxFuel = 100f;
     public float fuel;
+
+    public String name;
 
     public RevoluteJoint wheelJoint1;
     public RevoluteJoint wheelJoint2;
 
     public static float width = .4f;
 
+    public float barrelAngle = 90f;
+
     private boolean takingTurn = false;
     public boolean isTakingTurn() { return takingTurn; }
+
 
     public void startTurn() {
         takingTurn = true;
@@ -35,8 +46,53 @@ public abstract class Tank extends GameObjectDynamic {
     }
     public abstract void takeTurn();
 
-    public Tank(String image) {
-        super(image);
+    public Tank(int id, String tankImage, String barrelImage, String name, Vector2 position) {
+        super(id, tankImage, position);
+
+        this.name = name;
+
+        barrelSprite = new Sprite(new Texture(barrelImage));
+        barrelSprite.setSize(width, .3f);
+        barrelSprite.setOrigin(barrelSprite.getWidth(), barrelSprite.getHeight() / 2) ;
+
+        healthSprite = new Sprite(new Texture("HealthBar.png"));
+        healthSprite.setSize(width, .05f);
+        healthSprite.setOrigin(healthSprite.getWidth(), healthSprite.getHeight() / 2) ;
+
+        fuelSprite = new Sprite(new Texture("FuelBar.png"));
+        fuelSprite.setSize(width, .05f);
+        barrelSprite.setOrigin(barrelSprite.getWidth(), barrelSprite.getHeight() / 2) ;
+
+    }
+
+    @Override
+    public void update(float deltaTime) {
+        super.update(deltaTime);
+        sprite.setPosition(body.getPosition().x - sprite.getWidth() / 2, body.getPosition().y - sprite.getHeight() / 4);
+        barrelSprite.setPosition(body.getPosition().x - barrelSprite.getWidth(),
+                body.getPosition().y - barrelSprite.getHeight() / 2);
+
+        barrelSprite.setRotation(-barrelAngle + sprite.getRotation());
+
+        healthSprite.setPosition(body.getPosition().x - healthSprite.getWidth() / 2,
+                body.getPosition().y - healthSprite.getHeight() * 4);
+        fuelSprite.setPosition(body.getPosition().x - fuelSprite.getWidth() / 2,
+                body.getPosition().y - fuelSprite.getHeight() * 5 - 1 / Globals.PPM);
+
+        healthSprite.setSize(width * currentHealth / maxHealth, healthSprite.getHeight());
+        fuelSprite.setSize( width * fuel / maxFuel, fuelSprite.getHeight());
+
+    }
+
+    @Override
+    public void render(SpriteBatch batch) {
+        super.render(batch);
+        batch.begin();
+        barrelSprite.draw(batch);
+        healthSprite.draw(batch);
+        fuelSprite.draw(batch);
+
+        batch.end();
     }
 
     public void endTurn() {
@@ -54,7 +110,7 @@ public abstract class Tank extends GameObjectDynamic {
     @Override
     public Body getBody(World world) {
         BodyDef bodyBodyDef = new BodyDef();
-        bodyBodyDef.position.set(1, 2);
+        bodyBodyDef.position.set(0, 0);
         bodyBodyDef.type = BodyDef.BodyType.DynamicBody;
         Body bodyBody = world.createBody(bodyBodyDef);
 
@@ -128,13 +184,17 @@ public abstract class Tank extends GameObjectDynamic {
         }
     }
 
-    @Override
-    public void update(float deltaTime) {
-        super.update(deltaTime);
-        sprite.setPosition(body.getPosition().x - sprite.getWidth() / 2, body.getPosition().y - sprite.getHeight() / 4);
+    public void takeDamage(float amount) {
+        currentHealth-=amount;
     }
 
     public void fire(float degrees, float power) {
-        WorldHandler.getInstance().addGameObject(new PlainMissile("missile.gif", body.getPosition(), degrees, power));
+        WorldHandler.getInstance().addGameObject(
+                new PlainMissile("missile.gif",
+                        new Vector2(barrelSprite.getX() + barrelSprite.getWidth(),
+                                barrelSprite.getY() * 4/2),
+                        degrees,
+                        power,
+                        this));
     }
 }

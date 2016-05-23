@@ -12,12 +12,15 @@ import com.eightbitforest.wwc.interfaces.IUpdates;
  */
 public abstract class GameObject implements IUpdates {
     public Sprite sprite;
+    public int id;
 
-    public GameObject(Sprite sprite) {
+    public GameObject(int id, Sprite sprite) {
+        this.id = id;
         this.sprite = sprite;
     }
-    public GameObject(String image) {
-        sprite = getSprite(image);
+    public GameObject(int id, String image) {
+        this.id = id;
+        this.sprite = getSprite(image);
     }
 
     public Sprite getSprite(String image) {

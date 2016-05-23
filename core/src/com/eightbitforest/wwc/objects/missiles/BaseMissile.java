@@ -5,7 +5,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.async.ThreadUtils;
+import com.eightbitforest.wwc.handlers.GameHandler;
 import com.eightbitforest.wwc.handlers.Globals;
+import com.eightbitforest.wwc.handlers.WorldHandler;
+import com.eightbitforest.wwc.objects.Tank;
 import com.eightbitforest.wwc.objects.base.GameObjectDynamic;
 
 /**
@@ -13,12 +17,34 @@ import com.eightbitforest.wwc.objects.base.GameObjectDynamic;
  */
 public abstract class BaseMissile extends GameObjectDynamic {
 
-    public BaseMissile(String image, Vector2 position, float degrees, float power) {
-        super(image);
+    public int radius;
+    public boolean exploded = false;
+    public Tank sender;
+
+    public BaseMissile(int id, String image, Vector2 position, float degrees, float power, int radius, Tank sender) {
+        super(id, image);
         body.setTransform(position, degrees);
         body.applyLinearImpulse(new Vector2((float)Math.cos(Math.toRadians(degrees)) * power, (float)Math.sin(Math.toRadians(degrees)) * power), body.getWorldCenter(), true);
         sprite.setPosition(body.getPosition().x, body.getPosition().y);
         sprite.setRotation(degrees);
+        this.sender = sender;
+
+        this.radius = radius;
+    }
+
+    public void explode() {
+        exploded = true;
+        WorldHandler.getInstance().removeGameObject(this, body);
+    }
+
+    @Override
+    public void onCollideEnter(GameObjectDynamic other, Contact contact) {
+        if (other instanceof Tank) {
+            if (other != sender) {
+                explode();
+                GameHandler.getInstance().roundHandler.doCalc((Tank) other, 20);
+            }
+        }
     }
 
     @Override

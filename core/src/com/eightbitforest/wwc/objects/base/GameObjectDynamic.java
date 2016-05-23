@@ -1,8 +1,10 @@
 package com.eightbitforest.wwc.objects.base;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
+import com.eightbitforest.wwc.handlers.BodyData;
 import com.eightbitforest.wwc.handlers.WorldHandler;
 
 public abstract class GameObjectDynamic extends GameObject {
@@ -23,16 +25,28 @@ public abstract class GameObjectDynamic extends GameObject {
     }
 
     public abstract Body getBody(World world);
+    public void onCollideEnter(GameObjectDynamic other, Contact contact) {}
+    public void onCollideExit(GameObjectDynamic other, Contact contact) {}
 
-    public GameObjectDynamic(Sprite sprite) {
-        super(sprite);
+    public GameObjectDynamic(int id, Sprite sprite) {
+        super(id, sprite);
         shapes = new Array<Shape>();
         body = getBody(WorldHandler.getWorld());
+        body.setUserData(new BodyData(this, id));
     }
-    public GameObjectDynamic(String image) {
-        super(image);
+    public GameObjectDynamic(int id, String image) {
+        super(id, image);
         shapes = new Array<Shape>();
         body = getBody(WorldHandler.getWorld());
+        body.setUserData(new BodyData(this, id));
+    }
+
+    public GameObjectDynamic(int id, String image, Vector2 position) {
+        super(id, image);
+        shapes = new Array<Shape>();
+        body = getBody(WorldHandler.getWorld());
+        body.setTransform(position, body.getAngle());
+        body.setUserData(new BodyData(this, id));
     }
 
     @Override
