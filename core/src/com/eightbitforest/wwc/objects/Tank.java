@@ -24,7 +24,7 @@ public abstract class Tank extends GameObjectDynamic {
 
     public final float maxVelocity = 7.5f;
     public float currentVelocity;
-    public final float maxFuel = 100f;
+    public final float maxFuel = 250f;
     public float fuel;
 
     public String name;
@@ -32,7 +32,7 @@ public abstract class Tank extends GameObjectDynamic {
     public RevoluteJoint wheelJoint1;
     public RevoluteJoint wheelJoint2;
 
-    public static float width = .4f;
+    public static float width = .6f;
 
     public float barrelAngle = 90f;
 
@@ -52,16 +52,18 @@ public abstract class Tank extends GameObjectDynamic {
         this.name = name;
 
         barrelSprite = new Sprite(new Texture(barrelImage));
-        barrelSprite.setSize(width, .3f);
+        barrelSprite.setSize(width, .5f);
         barrelSprite.setOrigin(barrelSprite.getWidth(), barrelSprite.getHeight() / 2) ;
 
         healthSprite = new Sprite(new Texture("HealthBar.png"));
-        healthSprite.setSize(width, .05f);
-        healthSprite.setOrigin(healthSprite.getWidth(), healthSprite.getHeight() / 2) ;
+        healthSprite.setSize(width, .1f);
+        healthSprite.setOrigin(0, 0) ;
 
         fuelSprite = new Sprite(new Texture("FuelBar.png"));
-        fuelSprite.setSize(width, .05f);
-        barrelSprite.setOrigin(barrelSprite.getWidth(), barrelSprite.getHeight() / 2) ;
+        fuelSprite.setSize(width, .1f);
+        fuelSprite.setOrigin(0, 0) ;
+
+
 
     }
 
@@ -71,12 +73,18 @@ public abstract class Tank extends GameObjectDynamic {
         sprite.setPosition(body.getPosition().x - sprite.getWidth() / 2, body.getPosition().y - sprite.getHeight() / 4);
         barrelSprite.setPosition(body.getPosition().x - barrelSprite.getWidth(),
                 body.getPosition().y - barrelSprite.getHeight() / 2);
-
         barrelSprite.setRotation(-barrelAngle + sprite.getRotation());
+        Vector2 barrelPos = new Vector2(barrelSprite.getX(), barrelSprite.getY());
+        barrelPos = barrelPos.add(
+                new Vector2(
+                        -.25f * (float)Math.cos(Math.toRadians(barrelSprite.getRotation())),
+                        -.25f * (float)Math.sin(Math.toRadians(barrelSprite.getRotation()))
+                ));
+        barrelSprite.setPosition(barrelPos.x, barrelPos.y);
 
-        healthSprite.setPosition(body.getPosition().x - healthSprite.getWidth() / 2,
+        healthSprite.setPosition(body.getPosition().x - sprite.getWidth() / 4,
                 body.getPosition().y - healthSprite.getHeight() * 4);
-        fuelSprite.setPosition(body.getPosition().x - fuelSprite.getWidth() / 2,
+        fuelSprite.setPosition(body.getPosition().x - sprite.getWidth() / 4,
                 body.getPosition().y - fuelSprite.getHeight() * 5 - 1 / Globals.PPM);
 
         healthSprite.setSize(width * currentHealth / maxHealth, healthSprite.getHeight());
@@ -86,12 +94,11 @@ public abstract class Tank extends GameObjectDynamic {
 
     @Override
     public void render(SpriteBatch batch) {
-        super.render(batch);
         batch.begin();
         barrelSprite.draw(batch);
         healthSprite.draw(batch);
         fuelSprite.draw(batch);
-
+        sprite.draw(batch);
         batch.end();
     }
 
@@ -102,7 +109,7 @@ public abstract class Tank extends GameObjectDynamic {
     @Override
     public Sprite getSprite(String image) {
         Sprite sprite = new Sprite(new Texture(image));
-        sprite.setSize(width * 2, .4f);
+        sprite.setSize(width * 2, .6f);
         sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 4);
         return sprite;
     }
@@ -111,6 +118,7 @@ public abstract class Tank extends GameObjectDynamic {
     public Body getBody(World world) {
         BodyDef bodyBodyDef = new BodyDef();
         bodyBodyDef.position.set(0, 0);
+        bodyBodyDef.angle = 0f;
         bodyBodyDef.type = BodyDef.BodyType.DynamicBody;
         Body bodyBody = world.createBody(bodyBodyDef);
 
@@ -125,7 +133,7 @@ public abstract class Tank extends GameObjectDynamic {
 
         FixtureDef wheelDef = new FixtureDef();
         CircleShape wheelShape = getCircleShape();
-        wheelShape.setRadius(.1f);
+        wheelShape.setRadius(.15f);
         wheelDef.shape = wheelShape;
         wheelDef.density = 20f;
         wheelDef.restitution = 0f;
@@ -148,7 +156,7 @@ public abstract class Tank extends GameObjectDynamic {
         wheelJointDef.enableLimit = false;
         wheelJointDef.bodyA = bodyBody;
         wheelJointDef.bodyB = wheel1;
-        wheelJointDef.localAnchorA.set(-.2f, 0f);
+        wheelJointDef.localAnchorA.set(-.3f, 0f);
         wheelJointDef.localAnchorB.set(0, 0);
         wheelJointDef.collideConnected = false;
         wheelJoint1 = (RevoluteJoint)world.createJoint(wheelJointDef);
@@ -159,7 +167,7 @@ public abstract class Tank extends GameObjectDynamic {
         wheelJointDef1.maxMotorTorque = 50;
         wheelJointDef1.bodyA = bodyBody;
         wheelJointDef1.bodyB = wheel2;
-        wheelJointDef1.localAnchorA.set(.2f, 0f);
+        wheelJointDef1.localAnchorA.set(.3f, 0f);
         wheelJointDef1.localAnchorB.set(0, 0);
         wheelJointDef1.collideConnected = false;
         wheelJoint2 = (RevoluteJoint)world.createJoint(wheelJointDef1);
@@ -192,7 +200,7 @@ public abstract class Tank extends GameObjectDynamic {
         WorldHandler.getInstance().addGameObject(
                 new PlainMissile("missile.gif",
                         new Vector2(barrelSprite.getX() + barrelSprite.getWidth(),
-                                barrelSprite.getY() * 4/2),
+                                barrelSprite.getY() + barrelSprite.getHeight() * 2),
                         degrees,
                         power,
                         this));

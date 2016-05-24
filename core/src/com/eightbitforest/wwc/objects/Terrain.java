@@ -37,7 +37,8 @@ public class Terrain extends GameObjectDynamic {
     public Sprite getSprite(String image) {
         Sprite sprite = new Sprite(new Texture(image));
         sprite.setOrigin(sprite.getWidth() / Globals.PPM, sprite.getHeight() / Globals.PPM);
-        sprite.setSize(sprite.getWidth() / Globals.PPM, sprite.getHeight() / Globals.PPM);
+        sprite.setSize(Gdx.graphics.getWidth() / Globals.PPM, Gdx.graphics.getHeight() / Globals.PPM);
+
         return sprite;
     }
 
@@ -83,7 +84,7 @@ public class Terrain extends GameObjectDynamic {
                 break;
             }
         }
-
+        Gdx.app.log("WWC", "Got y of: " + sprite.getHeight());
         return (int)(sprite.getHeight() * Globals.PPM - y);
     }
 

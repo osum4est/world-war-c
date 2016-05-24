@@ -1,6 +1,8 @@
 package com.eightbitforest.wwc.handlers;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -32,6 +34,10 @@ public class WorldHandler {
     private Array<Tank> tanks;
     public Array<Tank> getTanks() { return tanks; }
 
+    private Sprite background;
+    private Sprite clouds;
+    private float cloudSpeed = .25f;
+
     public WorldHandler() {
         _world = new World(new Vector2(0, -9.81f), false);
         _instance = this;
@@ -45,8 +51,16 @@ public class WorldHandler {
         addGameObject(terrain);
 
         tanks = new Array<Tank>();
-        tanks.add(new HumanTank(ID.TANK0, "tank.png", "barrel.png", "Player 1", new Vector2(1, 2)));
-        tanks.add(new HumanTank(ID.TANK1, "tank.png", "barrel.png", "Player 2", new Vector2(4, 2)));
+        tanks.add(new HumanTank(ID.TANK0, "tank.png", "barrel.png", "Player 1", new Vector2(1, 3.5f)));
+        tanks.add(new HumanTank(ID.TANK1, "tankBody.png", "tankGun.png", "Player 2", new Vector2(12, 3.65f)));
+
+        background = new Sprite(new Texture(Gdx.files.internal("backdrop.png")));
+        background.setSize(Gdx.graphics.getWidth() / Globals.PPM, Gdx.graphics.getHeight() / Globals.PPM);
+
+        clouds = new Sprite(new Texture(Gdx.files.internal("clouds.png")));
+        clouds.setSize(Gdx.graphics.getWidth() / Globals.PPM * 2, Gdx.graphics.getHeight() / Globals.PPM / 2);
+        clouds.setPosition(0, Gdx.graphics.getHeight() / Globals.PPM / 2);
+
 
         for (Tank tank : tanks) {
             addGameObject(tank);
@@ -56,6 +70,10 @@ public class WorldHandler {
     }
 
     public void render(SpriteBatch batch) {
+        batch.begin();
+        background.draw(batch);
+        clouds.draw(batch);
+        batch.end();
 
         for (GameObject object : gameObjects)
             object.render(batch);
@@ -65,6 +83,11 @@ public class WorldHandler {
 
     public void update(float deltatime) {
         getWorld().step(1 / 60f, 8, 3);
+
+        clouds.setPosition(clouds.getX() - cloudSpeed * deltatime, clouds.getY());
+        if (clouds.getX() <= -Gdx.graphics.getWidth() / Globals.PPM)
+            clouds.setX(0f);
+
         for (GameObject object : gameObjects)
             object.update(deltatime);
 

@@ -9,6 +9,6 @@ import com.eightbitforest.wwc.objects.Tank;
  */
 public class PlainMissile extends BaseMissile {
     public PlainMissile(String image, Vector2 position, float degrees, float power, Tank sender) {
-        super(ID.MISSILE, image, position, degrees, power, 25, sender);
+        super(ID.MISSILE, image, position, degrees, power, 40, sender);
     }
 }

@@ -2,19 +2,16 @@ package com.eightbitforest.wwc.handlers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
 
-/**
- * Created by osum4est on 5/17/16.
- */
 public class TextHandler {
 
     static String text = "";
@@ -51,8 +48,6 @@ public class TextHandler {
         });
     }
 
-
-
     public static void showIndefinate(String text) {
         timer.clear();
         TextHandler.text = text;
@@ -69,19 +64,27 @@ public class TextHandler {
         }, time);
     }
 
+    public static void clear() {
+        showIndefinate("");
+    }
+
     public static void draw(SpriteBatch batch) {
 
         batch.begin();
         batch.setProjectionMatrix(GameHandler.getInstance().cameraHandler.uiCamera.combined);
-        font.draw(batch, text, -Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
+        font.draw(batch, text, -Gdx.graphics.getWidth() / 2 + 15, Gdx.graphics.getHeight() / 2 - 15);
         batch.end();
         stage.draw();
     }
 
+
+    private static boolean inputOnScreen = false;
     public static String getInput(int x, int y) {
-        if (stage.getActors().contains(textField, true)) {
+        if (inputOnScreen) {
             if (hitEnter) {
+                hitEnter =false;
                 textField.remove();
+                inputOnScreen = false;
                 return textField.getText();
             }
         }
@@ -90,6 +93,7 @@ public class TextHandler {
             stage.addActor(textField);
             textField.setText("");
             stage.setKeyboardFocus(textField);
+            inputOnScreen = true;
         }
 
         return "";

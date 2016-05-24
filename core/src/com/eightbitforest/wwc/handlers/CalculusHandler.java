@@ -43,15 +43,18 @@ public class CalculusHandler {
                         equation);
                 stage = Stage.waitingforanswer;
             case waitingforanswer:
-                String input = TextHandler.getInput(5, Gdx.graphics.getHeight() * 3/4);
+                String input = TextHandler.getInput(15, Gdx.graphics.getHeight() - 150);
                 if (!input.equals("")) {
-                    if (input.replaceAll("\\s+","").equals(getAnswer()))
+                    if (input.replaceAll("\\s+","").equals(getAnswer())) {
                         status = CalcStatus.succses;
-                    else
+                        TextHandler.show("Correct!", 1);
+                    }
+                    else {
                         status = CalcStatus.failure;
+                        TextHandler.show("Incorrect", 1);
+                    }
 
                     stage = Stage.idle;
-
                 }
                 break;
         }
